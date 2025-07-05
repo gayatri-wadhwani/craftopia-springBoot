@@ -1,10 +1,9 @@
 package com.example.craftopia.DTO;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+
+@Data
 public class RegisterRequest {
     private String name;
     private String email;

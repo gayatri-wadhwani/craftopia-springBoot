@@ -2,8 +2,7 @@ package com.example.craftopia.DTO;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

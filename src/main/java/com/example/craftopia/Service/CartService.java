@@ -41,11 +41,8 @@ public class CartService {
 
     // Add item to user's cart
     public void addToCart(AddToCartRequest req) {
-        User user = userRepository.findById(req.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Cart cart = cartRepo.findByUserAndIsDeletedFalse(user)
-                .orElseGet(() -> cartRepo.save(Cart.builder().user(user).items(new ArrayList<>()).build()));
+        Cart cart = cartRepo.findByUserIdAndIsDeletedFalse(req.getUserId())
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         Optional<CartItem> existingItem = cart.getItems().stream()
                 .filter(i -> i.getProductId().equals(req.getProductId()))

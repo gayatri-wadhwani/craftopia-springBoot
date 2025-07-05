@@ -27,8 +27,8 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<?> getAll(
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String search
+            @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name="search", required = false) String search
     ) {
         try {
             return ResponseEntity.ok(service.getAllProducts(category, search));
@@ -38,7 +38,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(service.getProductById(id));
         } catch (Exception e) {
@@ -47,7 +47,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ProductRequest dto) {
+    public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody ProductRequest dto) {
         try {
             return ResponseEntity.ok(service.updateProduct(id, dto));
         } catch (Exception e) {
@@ -56,7 +56,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
             service.deleteProduct(id);
             return ResponseEntity.noContent().build();

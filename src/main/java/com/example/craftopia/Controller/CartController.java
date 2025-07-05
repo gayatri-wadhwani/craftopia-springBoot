@@ -15,7 +15,7 @@ public class CartController {
     private CartService service;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getCart(@PathVariable Long userId) {
+    public ResponseEntity<?> getCart(@PathVariable("userId") Long userId) {
         try {
             return ResponseEntity.ok(service.getCartItems(userId));
         } catch (Exception e) {
@@ -34,7 +34,7 @@ public class CartController {
     }
 
     @DeleteMapping("/{userId}/remove/{productId}")
-    public ResponseEntity<?> removeFromCart(@PathVariable Long userId, @PathVariable Long productId) {
+    public ResponseEntity<?> removeFromCart(@PathVariable("userId") Long userId, @PathVariable("productId") Long productId) {
         try {
             service.removeFromCart(userId, productId);
             return ResponseEntity.ok("Item removed from cart");
@@ -44,7 +44,7 @@ public class CartController {
     }
 
     @DeleteMapping("/{userId}/clear")
-    public ResponseEntity<?> clearCart(@PathVariable Long userId) {
+    public ResponseEntity<?> clearCart(@PathVariable("userId") Long userId) {
         try {
             service.clearCart(userId);
             return ResponseEntity.ok("Cart cleared");

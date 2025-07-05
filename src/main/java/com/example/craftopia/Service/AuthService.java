@@ -1,6 +1,7 @@
 package com.example.craftopia.Service;
 
 import com.example.craftopia.DTO.AuthRequest;
+import com.example.craftopia.DTO.AuthResponse;
 import com.example.craftopia.DTO.RegisterRequest;
 import com.example.craftopia.Entity.Role;
 import com.example.craftopia.Entity.RoleName;
@@ -8,6 +9,7 @@ import com.example.craftopia.Entity.User;
 import com.example.craftopia.Repository.RoleRepository;
 import com.example.craftopia.Repository.UserRepository;
 import com.example.craftopia.Security.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +17,15 @@ import java.util.Set;
 
 @Service
 public class AuthService {
-    private final UserRepository userRepo;
-    private final RoleRepository roleRepo;
-    private final PasswordEncoder encoder;
-    private final JwtUtil jwt;
+    @Autowired
+    private UserRepository userRepo;
+    @Autowired
+    private RoleRepository roleRepo;
+    @Autowired
+    private PasswordEncoder encoder;
+    @Autowired
+    private JwtUtil jwt;
 
-    public AuthService(UserRepository ur, RoleRepository rr, PasswordEncoder pe, JwtUtil jwt) {
-        this.userRepo = ur; this.roleRepo = rr; this.encoder = pe; this.jwt = jwt;
-    }
 
     public AuthResponse register(RegisterRequest req) {
         if (userRepo.findByEmail(req.getEmail()).isPresent()) {

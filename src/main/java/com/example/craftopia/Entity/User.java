@@ -1,14 +1,13 @@
 package com.example.craftopia.Entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+
 
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "users")
 public class User {
     @Id
