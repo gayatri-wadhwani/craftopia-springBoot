@@ -1,7 +1,6 @@
 package com.example.craftopia.Controller;
 
 import com.example.craftopia.DTO.AuthRequest;
-import com.example.craftopia.DTO.AuthResponse;
 import com.example.craftopia.DTO.RegisterRequest;
 import com.example.craftopia.Service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         try {
-            AuthResponse response = auth.register(req);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(auth.register(req));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: "+e.getMessage());
         }
@@ -30,8 +28,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest req) {
         try {
-            AuthResponse response = auth.login(req);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(auth.login(req));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: "+e.getMessage());
         }
