@@ -1,7 +1,6 @@
 package com.example.craftopia.Service;
 
 import com.example.craftopia.DTO.AuthRequest;
-import com.example.craftopia.DTO.AuthResponse;
 import com.example.craftopia.DTO.RegisterRequest;
 import com.example.craftopia.Entity.Role;
 import com.example.craftopia.Entity.RoleName;
