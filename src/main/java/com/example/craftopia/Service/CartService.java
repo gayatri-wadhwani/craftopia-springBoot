@@ -40,10 +40,28 @@ public class CartService {
     }
 
     // Add item to user's cart
-    public void addToCart(AddToCartRequest req) {
-        Cart cart = cartRepo.findByUserIdAndIsDeletedFalse(req.getUserId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+    public void addToCart(Long userId, AddToCartRequest req) {
+        // Step 1: Ensure product exists and is not deleted
+        Product product = productRepo.findById(req.getProductId())
+                .filter(p -> !p.isDeleted())
+                .orElseThrow(() -> new RuntimeException("Product not available"));
 
+        // Step 2: Fetch or create the user's cart
+        Cart cart = cartRepo.findByUserIdAndIsDeletedFalse(userId)
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setUser(userRepository.findById(userId)
+                            .orElseThrow(() -> new RuntimeException("User not found")));
+                    newCart.setItems(new ArrayList<>()); // Ensure it's initialized
+                    return cartRepo.save(newCart);
+                });
+
+        // Step 3: Null safety for items list if cart already existed
+        if (cart.getItems() == null) {
+            cart.setItems(new ArrayList<>());
+        }
+
+        // Step 4: Check if item already exists in cart
         Optional<CartItem> existingItem = cart.getItems().stream()
                 .filter(i -> i.getProductId().equals(req.getProductId()))
                 .findFirst();
@@ -62,16 +80,36 @@ public class CartService {
         cartRepo.save(cart);
     }
 
+    // Get Item Count in Cart
+    // Get total quantity of items in Cart
+    public int getCartItemCount(Long userId) {
+        Cart cart = cartRepo.findByUserIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+        return cart.getItems().stream()
+                .mapToInt(CartItem::getQuantity)
+                .sum();
+    }
+
     // Remove a product from the user's cart
     public void removeFromCart(Long userId, Long productId) {
         Cart cart = cartRepo.findByUserIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        cart.setItems(cart.getItems().stream()
-                .filter(item -> !item.getProductId().equals(productId))
-                .collect(Collectors.toList()));
+        Optional<CartItem> itemOpt = cart.getItems().stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst();
 
-        cartRepo.save(cart);
+        if (itemOpt.isPresent()) {
+            CartItem item = itemOpt.get();
+            if (item.getQuantity() > 1) {
+                item.setQuantity(item.getQuantity() - 1); // decrement quantity
+            } else {
+                cart.getItems().remove(item); // remove item completely if quantity == 1
+            }
+            cartRepo.save(cart);
+        } else {
+            throw new RuntimeException("Product not found in cart");
+        }
     }
 
     // Clear the user's cart
@@ -79,6 +117,7 @@ public class CartService {
         Cart cart = cartRepo.findByUserIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
+        itemRepo.deleteAll(cart.getItems());
         cart.getItems().clear();
         cartRepo.save(cart);
     }

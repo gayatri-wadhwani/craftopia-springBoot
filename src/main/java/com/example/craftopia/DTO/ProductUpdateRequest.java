@@ -2,16 +2,14 @@ package com.example.craftopia.DTO;
 
 import lombok.*;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Builder
-public class ProductResponse {
-    private Long id;
+public class ProductUpdateRequest {
     private String name;
     private String description;
     private Double price;
     private String category;
     private String imageUrl;
-    private String sellerEmail;
 }
