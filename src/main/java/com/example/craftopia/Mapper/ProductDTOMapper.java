@@ -23,6 +23,7 @@ public class ProductDTOMapper {
                 .price(product.getPrice())
                 .category(product.getCategory())
                 .imageUrl(product.getImageUrl())
+                .sellerEmail(product.getSeller().getEmail())
                 .build();
     }
 }

@@ -1,11 +1,17 @@
 package com.example.craftopia.Controller;
 
 import com.example.craftopia.DTO.ProductRequest;
+import com.example.craftopia.DTO.ProductResponse;
+import com.example.craftopia.DTO.ProductUpdateRequest;
 import com.example.craftopia.Service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 
 @RestController
@@ -17,6 +23,7 @@ public class ProductController {
     public ProductService service;
 
     @PostMapping
+    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<?> create(@RequestBody ProductRequest dto) {
         try {
             return ResponseEntity.ok(service.createProduct(dto));
@@ -24,6 +31,29 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create product: " + e.getMessage());
         }
     }
+    @PostMapping("/bulk-json")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> bulkCreateJson(@RequestBody List<ProductRequest> productList) {
+        try {
+            return ResponseEntity.ok(service.bulkCreateProducts(productList));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Bulk creation failed: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/bulk-csv")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> bulkCreateFromCSV(@RequestParam("file") MultipartFile file) {
+        try {
+            return ResponseEntity.ok(service.bulkCreateProductsFromCSV(file));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CSV processing failed: " + e.getMessage());
+        }
+    }
+
+
 
     @GetMapping
     public ResponseEntity<?> getAll(
@@ -37,6 +67,19 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/my-products")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> getSellerProducts() {
+        try {
+            List<ProductResponse> sellerProducts = service.getProductsBySeller();
+            return ResponseEntity.ok(sellerProducts);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch seller products: " + e.getMessage());
+        }
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") Long id) {
         try {
@@ -46,16 +89,21 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody ProductRequest dto) {
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> partialUpdate(
+            @PathVariable("id") Long id,
+            @RequestBody ProductUpdateRequest dto) {
         try {
-            return ResponseEntity.ok(service.updateProduct(id, dto));
+            return ResponseEntity.ok(service.partialUpdateProduct(id, dto));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Failed to update product "+e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Failed to update product: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
             service.deleteProduct(id);
