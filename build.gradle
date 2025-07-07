@@ -41,6 +41,7 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // Uses Jackson for JSON processing
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'com.opencsv:opencsv:5.11'
+	implementation "com.razorpay:razorpay-java:1.4.3"
 }
 
 dependencyManagement {
