@@ -3,7 +3,10 @@ package com.example.craftopia.Controller;
 import com.example.craftopia.DTO.ProductRequest;
 import com.example.craftopia.DTO.ProductResponse;
 import com.example.craftopia.DTO.ProductUpdateRequest;
+import com.example.craftopia.Service.CloudinaryService;
 import com.example.craftopia.Service.ProductService;
+import com.example.craftopia.Service.ai.AIOrchestrationService;
+import com.example.craftopia.Util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +19,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 public class ProductController {
 
     @Autowired
     public ProductService service;
+    @Autowired private AIOrchestrationService aiOrchestrationService;
+    @Autowired private SecurityUtil securityUtil;
+    @Autowired private CloudinaryService cloudinaryService;
 
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
@@ -53,8 +59,6 @@ public class ProductController {
         }
     }
 
-
-
     @GetMapping
     public ResponseEntity<?> getAll(
             @RequestParam(name = "category", required = false) String category,
@@ -66,6 +70,7 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch products "+e.getMessage());
         }
     }
+
 
     @GetMapping("/my-products")
     @PreAuthorize("hasRole('SELLER')")
@@ -112,4 +117,31 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found or already deleted "+e.getMessage());
         }
     }
+
+
+    @PostMapping("/ai/auto-fill")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<?> autoFillProduct(
+            @RequestParam("image") MultipartFile image,
+            @RequestParam(value = "text", required = false) String text,
+            @RequestParam("price") Double price) {
+        try {
+            if (image == null || image.isEmpty()) {
+                return ResponseEntity.badRequest().body("Image file is required.");
+            }
+
+            String sellerEmail = securityUtil.getCurrentUser().getEmail();
+            String imageUrl = cloudinaryService.uploadImage(image);
+
+            ProductResponse response = aiOrchestrationService.generateProductMetadata(
+                    sellerEmail, image, text, price, imageUrl
+            );
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("AI autofill failed: " + e.getMessage());
+        }
+    }
+
 }

@@ -10,7 +10,6 @@ import com.example.craftopia.Repository.ProductRepository;
 import com.example.craftopia.Repository.UserRepository;
 import com.example.craftopia.Util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.opencsv.CSVReader;
 import org.springframework.web.multipart.MultipartFile;

@@ -42,6 +42,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'com.opencsv:opencsv:5.11'
 	implementation "com.razorpay:razorpay-java:1.4.3"
+	implementation 'com.cloudinary:cloudinary-http44:1.34.0'
+	implementation 'com.squareup.okhttp3:okhttp:4.9.3'
 }
 
 dependencyManagement {

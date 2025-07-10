@@ -2,6 +2,8 @@ package com.example.craftopia.DTO;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,4 +14,8 @@ public class ProductRequest {
     private Double price;
     private String category;
     private String imageUrl;
+    private List<String> tags;
+    private String style;
+    private String originalLanguageText;
+    private String translatedText;
 }
