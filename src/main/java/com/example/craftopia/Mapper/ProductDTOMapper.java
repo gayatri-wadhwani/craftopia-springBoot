@@ -21,6 +21,8 @@ public class ProductDTOMapper {
     }
 
     public static ProductResponse toDTO(Product product) {
+        String sellerEmail = product.getSeller() != null ? product.getSeller().getEmail() : null;
+
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -30,6 +32,7 @@ public class ProductDTOMapper {
                 .imageUrl(product.getImageUrl())
                 .tags(product.getTags())
                 .style(product.getStyle())
+                .sellerEmail(sellerEmail)
                 .originalLanguageText(product.getOriginalLanguageText())
                 .translatedText(product.getTranslatedText())
                 .build();

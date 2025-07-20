@@ -26,7 +26,8 @@ public class Product {
 
     private String name;
 
-    @Column(length = 1000)
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private Double price;
@@ -51,7 +52,13 @@ public class Product {
     private List<String> tags = new ArrayList<>();
 
     private String style;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String originalLanguageText;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String translatedText;
 
 }
