@@ -8,9 +8,11 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/cart")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @PreAuthorize("hasRole('BUYER')")
 public class CartController {
 
@@ -45,7 +47,7 @@ public class CartController {
         try {
             Long userId = securityUtil.getCurrentUserId();
             service.addToCart(userId, req);
-            return ResponseEntity.ok("Item added to cart");
+            return ResponseEntity.ok(Map.of("message", "Item added to cart"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to add item: " + e.getMessage());
         }
@@ -56,7 +58,7 @@ public class CartController {
         try {
             Long userId = securityUtil.getCurrentUserId();
             service.removeFromCart(userId, productId);
-            return ResponseEntity.ok("Item removed from cart");
+            return ResponseEntity.ok(Map.of("message", "Item removed from cart"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to remove item: " + e.getMessage());
         }
@@ -67,7 +69,7 @@ public class CartController {
         try {
             Long userId = securityUtil.getCurrentUserId();
             service.clearCart(userId);
-            return ResponseEntity.ok("Cart cleared");
+            return ResponseEntity.ok(Map.of("Message", "Cart cleared"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to clear cart: " + e.getMessage());
         }

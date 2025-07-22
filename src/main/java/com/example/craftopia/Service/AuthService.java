@@ -3,9 +3,11 @@ package com.example.craftopia.Service;
 import com.example.craftopia.DTO.AuthRequest;
 import com.example.craftopia.DTO.AuthResponse;
 import com.example.craftopia.DTO.RegisterRequest;
+import com.example.craftopia.Entity.Cart;
 import com.example.craftopia.Entity.Role;
 import com.example.craftopia.Entity.RoleName;
 import com.example.craftopia.Entity.User;
+import com.example.craftopia.Repository.CartRepository;
 import com.example.craftopia.Repository.RoleRepository;
 import com.example.craftopia.Repository.UserRepository;
 import com.example.craftopia.Security.JwtUtil;
@@ -21,6 +23,8 @@ public class AuthService {
     private UserRepository userRepo;
     @Autowired
     private RoleRepository roleRepo;
+    @Autowired
+    private CartRepository cartRepo;
     @Autowired
     private PasswordEncoder encoder;
     @Autowired
@@ -56,7 +60,17 @@ public class AuthService {
         u.setRoles(Set.of(role));
         userRepo.save(u);
 
-        String token = jwt.generateToken(u.getEmail());
+        // Create cart for buyer
+        if (role.getName() == RoleName.ROLE_BUYER) {
+            Cart cart = Cart.builder()
+                    .user(u)
+                    .isDeleted(false)
+                    .build();
+            cartRepo.save(cart);
+        }
+
+
+        String token = jwt.generateToken(u.getEmail(), u.getRoles());
         return new AuthResponse(token);
     }
 
@@ -66,7 +80,7 @@ public class AuthService {
         if (!encoder.matches(req.getPassword(), u.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
-        return new AuthResponse(jwt.generateToken(u.getEmail()));
+        return new AuthResponse(jwt.generateToken(u.getEmail(), u.getRoles()));
     }
 }
 

@@ -33,6 +33,8 @@ public class AIOrchestrationService {
         // Get translated text
         String translatedCaption = geminiService.translateText(text);
 
+        System.out.println(translatedCaption);
+
         // Build ProductRequest to pass to ProductService
         ProductRequest productRequest = ProductRequest.builder()
                 .name(aiDetails.getEnglishTitle())
