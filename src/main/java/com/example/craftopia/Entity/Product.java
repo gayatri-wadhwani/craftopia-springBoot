@@ -9,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -24,7 +26,8 @@ public class Product {
 
     private String name;
 
-    @Column(length = 1000)
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private Double price;
@@ -44,5 +47,19 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id")
     private User seller;
+
+    @ElementCollection
+    private List<String> tags = new ArrayList<>();
+
+    private String style;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String originalLanguageText;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String translatedText;
+
 }
 
