@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class ProductController {
 
     @Autowired
@@ -35,7 +35,7 @@ public class ProductController {
             @RequestParam("name") String name,
             @RequestParam("description") String description,
             @RequestParam("price") Double price,
-            @RequestParam("category") String category,
+            @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "tags", required = false) List<String> tags,
             @RequestParam(value = "style", required = false) String style,
             @RequestParam(value = "originalLanguageText", required = false) String originalLanguageText,
@@ -156,7 +156,8 @@ public class ProductController {
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<?> autoFillProduct(
             @RequestParam("image") MultipartFile image,
-            @RequestParam(value = "text", required = false) String text,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "description", required = false) String text,
             @RequestParam("price") Double price) {
 
         try {
@@ -164,11 +165,14 @@ public class ProductController {
                 return ResponseEntity.badRequest().body("Image file is required.");
             }
 
+            System.out.println(name);
+            System.out.println(text);
             String imageUrl = cloudinaryService.uploadImage(image);
 
             ProductResponse response = aiOrchestrationService.generateProductMetadata(
                     image, text, price, imageUrl
             );
+            System.out.println(response);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
@@ -176,30 +180,4 @@ public class ProductController {
                     .body("AI autofill failed: " + e.getMessage());
         }
     }
-
-//    @PostMapping("/ai/auto-fill")
-//    @PreAuthorize("hasRole('SELLER')")
-//    public ResponseEntity<?> autoFillProduct(
-//            @RequestParam("image") MultipartFile image,
-//            @RequestParam(value = "text", required = false) String text,
-//            @RequestParam("price") Double price) {
-//        try {
-//            if (image == null || image.isEmpty()) {
-//                return ResponseEntity.badRequest().body("Image file is required.");
-//            }
-//
-//            String sellerEmail = securityUtil.getCurrentUser().getEmail();
-//            String imageUrl = cloudinaryService.uploadImage(image);
-//
-//            ProductResponse response = aiOrchestrationService.generateProductMetadata(
-//                    sellerEmail, image, text, price, imageUrl
-//            );
-//            return ResponseEntity.ok(response);
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("AI autofill failed: " + e.getMessage());
-//        }
-//    }
-
 }

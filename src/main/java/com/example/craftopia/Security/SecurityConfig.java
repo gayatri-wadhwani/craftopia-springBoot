@@ -1,5 +1,6 @@
 package com.example.craftopia.Security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -10,26 +11,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final MyUserDetailsService userDetailsService;
-    private final JwtUtil jwtUtil;
-
-    public SecurityConfig(MyUserDetailsService uds, JwtUtil jwt) {
-        this.userDetailsService = uds;
-        this.jwtUtil = jwt;
-    }
+    @Autowired
+    public JwtUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        JwtFilter jwtFilter = new JwtFilter(jwtUtil, userDetailsService);
+        JwtFilter jwtFilter = new JwtFilter(jwtUtil);
 
         http
+                .cors(withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/payment/**", "/h2-console/**", "/ai/**", "/products/**").permitAll()
+                        .requestMatchers("/auth/**", "/payment/**", "/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess
@@ -40,6 +39,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
